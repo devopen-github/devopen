@@ -1,0 +1,77 @@
+<form action="connexion.php" method="post">
+    Pseudo: <input type="text" name="pseudo" value="" />
+
+    Mot de passe: <input type="password" name="mdp" value="" />
+
+    <input type="submit" name="connexion" value="Connexion" />
+</form>
+<?php
+
+/*
+
+Page: connexion.php
+
+*/
+
+session_start();
+
+if(isset($_POST['connexion'])) { // si le bouton "Connexion" est appuyé
+
+
+    if(empty($_POST['pseudo'])) {
+
+        echo "Le champ Pseudo est vide.";
+
+    } else {
+
+
+        if(empty($_POST['mdp'])) {
+
+            echo "Le champ Mot de passe est vide.";
+
+        } else {
+
+            //Pour sécurise voila le code:
+
+            $Pseudo = htmlentities($_POST['pseudo'], ENT_QUOTES, "ISO-8859-1"); 
+
+            $MotDePasse = htmlentities($_POST['mdp'], ENT_QUOTES, "ISO-8859-1");
+
+
+
+            $mysqli = mysqli_connect("domaine.tld", "nom d'utilisateur", "mot de passe", "base de données");
+
+            //Voir si la connexion marche:
+
+            if(!$mysqli){
+
+                echo "Erreur de connexion à la base de données.";
+
+            } else {
+
+                $Requete = mysqli_query($mysqli,"SELECT * FROM membres WHERE pseudo = '".$Pseudo."' AND mdp = '".$MotDePasse."'");//si vous avez enregistré le mot de passe en md5() il vous suffira de faire la vérification en mettant mdp = '".md5($MotDePasse)."' au lieu de mdp = '".$MotDePasse."'
+
+
+                if(mysqli_num_rows($Requete) == 0) {
+
+                    echo "Le pseudo ou le mot de passe est incorrect, le compte n'a pas été trouvé.";
+
+                } else {
+
+                    // on ouvre la session avec $_SESSION:
+
+                    $_SESSION['pseudo'] = $Pseudo; 
+
+                    echo "Vous êtes à présent connecté !";
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
+?>
